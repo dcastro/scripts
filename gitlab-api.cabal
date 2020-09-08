@@ -1,0 +1,30 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: a75b58ad634fa503e59035c20a324abb55bbbb489bc272a18ddfaab66a3c36be
+
+name:           gitlab-api
+version:        0.1.0.0
+category:       Web
+homepage:       https://github.com/githubuser/gitlab-api#readme
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2020 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+
+executable gitlab-api
+  main-is: Main.hs
+  other-modules:
+      Paths_gitlab_api
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+  default-language: Haskell2010
