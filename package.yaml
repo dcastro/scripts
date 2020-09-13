@@ -1,8 +1,5 @@
-name:                gitlab-api
+name:                scripts
 version:             0.1.0.0
-#synopsis:
-#description:
-homepage:            https://github.com/githubuser/gitlab-api#readme
 license:             BSD3
 author:              Author name here
 maintainer:          example@example.com
@@ -13,8 +10,16 @@ extra-source-files:
 
 dependencies:
   - base >= 4.7 && < 5
+  - req
+  - aeson
+  - aeson-casing
+  - regex-tdfa
+  - universum
+  - time
+  - optparse-applicative
+  - http-client
+  - http-types
+  - async
 
-executables:
-  gitlab-api:
-    source-dirs:      src
-    main:             Main.hs
+library:
+  source-dirs:      src
