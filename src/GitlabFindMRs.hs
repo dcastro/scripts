@@ -1,5 +1,5 @@
 #!/usr/bin/env stack
--- stack --resolver lts-16.11 --install-ghc runghc --package req --package aeson --package aeson-casing --package regex-tdfa --package universum --package time --package optparse-applicative --package http-client --package http-types --package async
+-- stack --resolver lts-18.28 --install-ghc runghc --package req --package aeson --package aeson-casing --package regex-tdfa --package universum --package time --package optparse-applicative --package http-client --package http-types --package async
 {-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE DerivingStrategies         #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
