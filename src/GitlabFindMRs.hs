@@ -14,13 +14,15 @@
 -- | Finds all merged Merge Requests in a project that are linked to an issue with the given label.
 --
 -- Usage:
---   Find all merged MRs in the `morley` project that mention an issue with the label `test-lib`
+--   Find all merged MRs in the `morley` project that mention an issue with the label `cleveland`
 --   and were last updated this month.
---     stack GitlabFindMRs.hs -p morley-framework/morley --label test-lib
+--     stack GitlabFindMRs.hs -p morley-framework/morley --label cleveland
 --
---   Find all merged MRs in the `morley` project that mention an issue with the label `test-lib`
+--   Find all merged MRs in the `morley` project that mention an issue with the label `cleveland`
 --   and were last updated on or after August 2020.
---     stack GitlabFindMRs.hs -p morley-framework/morley --label test-lib --month 8 --year 2020
+--     stack GitlabFindMRs.hs -p morley-framework/morley --label cleveland --start '2020-08-01'
+--
+-- List of available labels: https://gitlab.com/morley-framework/morley/-/labels
 module GitlabFindMRs where
 
 import           Control.Concurrent.Async  (forConcurrently)
