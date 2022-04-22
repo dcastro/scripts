@@ -1,5 +1,6 @@
 #!/usr/bin/env stack
 -- stack --resolver lts-18.28 --install-ghc runghc --package req --package aeson --package aeson-casing --package regex-tdfa --package universum --package time --package optparse-applicative --package http-client --package http-types --package async
+{-# LANGUAGE BlockArguments             #-}
 {-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE DerivingStrategies         #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
@@ -43,7 +44,7 @@ mkBaseUrl opts = https "gitlab.com" /: "api" /: "v4" /: "projects" /: oProjectId
 
 data Options = Options
   { oProjectId :: Text
-  , oLabel     :: Text
+  , oLabels    :: [Text]
   , oStartDate :: Maybe Day
   }
   deriving Show
@@ -97,7 +98,10 @@ main = do
   matches <- fmap catMaybes . forConcurrently mrs $ \mr -> do
     let issueIds = extractMentions mr
     issues <- forConcurrently issueIds (getIssue opts)
-    let issuesWithLabel = filter (\i -> oLabel opts `elem` iLabels i) (catMaybes issues)
+    let issuesWithLabel =
+          flip filter (catMaybes issues) \i ->
+            flip any (oLabels opts) \l ->
+              l `elem` iLabels i
     if null issuesWithLabel
       then pure Nothing
       else pure (Just (mr, issuesWithLabel))
@@ -114,11 +118,11 @@ optsParser = Options
         <> short 'p'
         <> metavar "PROJECTID"
         <> help "The ID of the project in which to search for merge requests." )
-  <*> option str
+  <*> some (option str
         ( long "label"
         <> short 'l'
         <> metavar "LABEL"
-        <> help "The label by which to filter issues." )
+        <> help "The label by which to filter issues." ))
   <*> optional (option auto
         ( long "start"
         <> short 's'
@@ -143,6 +147,7 @@ printMatch mr issues = do
     putTextLn $ "        #" <> show (iIid issue)
     putTextLn $ "          Title : " <> iTitle issue
     putTextLn $ "          Link  : " <> iWebUrl issue
+    putTextLn $ "          Labels: " <> show (iLabels issue)
   putTextLn ""
 
 getIssue :: Options -> IssueId -> IO (Maybe Issue)
