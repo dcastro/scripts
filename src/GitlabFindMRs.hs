@@ -44,8 +44,7 @@ mkBaseUrl opts = https "gitlab.com" /: "api" /: "v4" /: "projects" /: oProjectId
 data Options = Options
   { oProjectId :: Text
   , oLabel     :: Text
-  , oMonth     :: Maybe Int
-  , oYear      :: Maybe Integer
+  , oStartDate :: Maybe Day
   }
   deriving Show
 
@@ -121,15 +120,10 @@ optsParser = Options
         <> metavar "LABEL"
         <> help "The label by which to filter issues." )
   <*> optional (option auto
-        ( long "month"
-        <> short 'm'
-        <> metavar "MONTH"
-        <> help "Defaults to the current month" ))
-  <*> optional (option auto
-        ( long "year"
-        <> short 'y'
-        <> metavar "YEAR"
-        <> help "Defaults to the current year" ))
+        ( long "start"
+        <> short 's'
+        <> metavar "DATE"
+        <> help "Defaults to the start of the current month" ))
 
 optsInfo :: ParserInfo Options
 optsInfo = info (optsParser <**> helper)
@@ -178,11 +172,11 @@ findMergeRequests baseUrl updatedAfter =
 
 mkUpdatedAfter :: MonadIO m => Options -> m Day
 mkUpdatedAfter opts = do
-  (currentYear, currentMonth, _) <- toGregorian . utctDay <$> liftIO getCurrentTime
-  pure $ fromGregorian
-    (fromMaybe currentYear (oYear opts))
-    (fromMaybe currentMonth (oMonth opts))
-    1
+  case oStartDate opts of
+    Nothing -> do
+      (currentYear, currentMonth, _) <- toGregorian . utctDay <$> liftIO getCurrentTime
+      pure $ fromGregorian currentYear currentMonth 1
+    Just d -> pure d
 
 paginate :: forall a. (Semigroup a, FromJSON a) => (Int -> Req (JsonResponse a)) -> Req a
 paginate mkRequest =
