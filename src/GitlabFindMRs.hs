@@ -71,7 +71,7 @@ data MergeRequest = MergeRequest
   , mrDescription :: String
   , mrWebUrl      :: Text
   , mrAuthor      :: Author
-  , mrUpdatedAt   :: UTCTime
+  , mrMergedAt    :: UTCTime
   }
   deriving Show
 
@@ -93,9 +93,9 @@ main = do
 
   let baseUrl = mkBaseUrl opts
   updatedAfter <- mkUpdatedAfter opts
-  mrs <- findMergeRequests baseUrl updatedAfter
+  mrs <- filter (wasMergedAfter updatedAfter) <$> findMergeRequests baseUrl updatedAfter
 
-  putTextLn $ "Found " <> show (length mrs) <> " MRs updated since " <> show updatedAfter <> ".\n"
+  putTextLn $ "Found " <> show (length mrs) <> " MRs merged since " <> show updatedAfter <> ".\n"
 
   matches <- fmap catMaybes . forConcurrently mrs $ \mr -> do
     let issueIds = extractMentions mr
@@ -112,6 +112,9 @@ main = do
 
   forM_ matches $ \(mr, issues) -> printMatch mr issues
 
+
+wasMergedAfter :: Day -> MergeRequest -> Bool
+wasMergedAfter mergedAfter mr = utctDay (mrMergedAt mr) >= mergedAfter
 
 optsParser :: Parser Options
 optsParser = Options
@@ -143,7 +146,7 @@ printMatch mr issues = do
   putTextLn $ "    Title      : " <> toText (mrTitle mr)
   putTextLn $ "    Link       : " <> mrWebUrl mr
   putTextLn $ "    Author     : " <> aName (mrAuthor mr)
-  putTextLn $ "    Updated At : " <> show (utctDay (mrUpdatedAt mr))
+  putTextLn $ "    Merged At  : " <> show (utctDay (mrMergedAt mr))
   putTextLn $ "    Mentions"
   forM_ issues $ \issue -> do
     putTextLn $ "        #" <> show (iIid issue)
